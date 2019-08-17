@@ -15,11 +15,18 @@ type
   [MVCPath('/')]
   TPizzariaBackendController = class(TMVCController)
   public
+    [MVCPath('/')]
+    [MVCHTTPMethod([httpGET])]
 
     [MVCDoc('Criar novo pedido "201: Created"')]
     [MVCPath('/efetuarPedido')]
     [MVCHTTPMethod([httpPOST])]
     procedure efetuarPedido(const AContext: TWebContext);
+
+    [MVCDoc('Consultar ultimo pedido')]
+    [MVCPath('/consultarPedido/($doc)')]
+    [MVCHTTPMethod([httpGET])]
+    procedure consultarPedido();
   end;
 
 implementation
@@ -32,6 +39,19 @@ uses
   UPedidoServiceImpl, UPedidoRetornoDTOImpl;
 
 { TApp1MainController }
+
+procedure TPizzariaBackendController.consultarPedido;
+var
+  oPedidoServ: TPedidoService;
+begin
+  oPedidoServ := TPedidoService.Create;
+  try
+     Render(TJson.ObjectToJsonString(oPedidoServ.consultarPedido(Context.Request.Params['doc'])));
+  finally
+    oPedidoServ.Free;
+  end;
+  Log.Info('==>Executou o método ', 'consultarPedido');
+end;
 
 procedure TPizzariaBackendController.efetuarPedido(const AContext: TWebContext);
 var
